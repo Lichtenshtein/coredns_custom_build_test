@@ -23,6 +23,13 @@
 5. [ads](https://github.com/missdeer/ads) 
 6. [https](https://github.com/v-byte-cpu/coredns-https)
 
+## this fork adds some PopuraDNS and mesh networks plugins
+
+7. [meshname](https://github.com/zhoreeq/coredns-meshname)
+8. [meship](https://github.com/zhoreeq/coredns-meship)
+9. [ens](https://github.com/wealdtech/coredns-ens)
+10. [wgsd](https://github.com/jwhited/wgsd)
+
 # Download Prebuilt Binaries
 
 All prebuilt binaries are built by [Appveyor service](https://ci.appveyor.com/project/missdeer/coredns-custom-build), you may choose the right binary for your platform from the list shown below:
