@@ -8,12 +8,6 @@ cd fallback
 pwd
 go mod init github.com/missdeer/fallback
 cd ..
-rm -rf on
-git clone --depth=1 github.com/coredns/caddy/onevent.git
-cd on
-pwd
-go mod init github.com/coredns/caddy/onevent
-cd ..
 rm -rf meshname
 git clone --depth=1 github.com/zhoreeq/coredns-meshname.git
 cd meshname
@@ -70,7 +64,7 @@ git apply "$APPVEYOR_BUILD_FOLDER/forward.go.patch"
 git apply "$APPVEYOR_BUILD_FOLDER/forward-setup.go.patch"
 sed -i 's|forward:forward|fallback:github.com/missdeer/fallback\ndnsredir:github.com/leiless/dnsredir\nforward:forward\nproxy:github.com/missdeer/proxy|g' plugin.cfg
 sed -i 's|hosts:hosts|ads:github.com/missdeer/ads\nhosts:hosts|g' plugin.cfg
-sed -i 's|cache:cache|cache:cache\non:github.com/coredns/caddy/onevent\nmeshname:github.com/zhoreeq/coredns-meshname\nmeship:github.com/zhoreeq/coredns-meship\nens:github.com/wealdtech/coredns-ens\nwgsd:github.com/jwhited/wgsd\nredisc:github.com/missdeer/redis|g' plugin.cfg
+sed -i 's|cache:cache|cache:cache\nmeshname:github.com/zhoreeq/coredns-meshname\nmeship:github.com/zhoreeq/coredns-meship\nens:github.com/wealdtech/coredns-ens\nwgsd:github.com/jwhited/wgsd\nredisc:github.com/missdeer/redis|g' plugin.cfg
 sed -i 's|rewrite:rewrite|rewrite:rewrite\nbogus:github.com/missdeer/bogus\nipset:github.com/missdeer/ipset|g' plugin.cfg
 echo "replace (" >> go.mod
 echo "    github.com/missdeer/fallback => ../fallback" >> go.mod
