@@ -13,7 +13,7 @@ git apply ../coredns_custom_build/forward-setup.go.patch
 sed -i.bak 's|forward:forward|fallback:github.com/missdeer/fallback\ndnsredir:github.com/leiless/dnsredir\nforward:forward\nproxy:github.com/missdeer/proxy\nhttps:github.com/v-byte-cpu/coredns-https|g' plugin.cfg
 sed -i.bak 's|hosts:hosts|ads:github.com/missdeer/ads\nblocklist:github.com/relekang/coredns-blocklist\nhosts:hosts|g' plugin.cfg
 sed -i.bak 's|rewrite:rewrite|rewrite:rewrite\nbogus:github.com/missdeer/bogus\nipset:github.com/missdeer/ipset|g' plugin.cfg
-sed -i.bak 's|cache:cache|cache:cache\non:github.com/coredns/caddy/onevent\nmeshname:github.com/zhoreeq/coredns-meshname\nmeship:github.com/zhoreeq/coredns-meship\nens:github.com/wealdtech/coredns-ens\nwgsd:github.com/jwhited/wgsd\nredisc:github.com/missdeer/redis|g' plugin.cfg
+sed -i.bak 's|cache:cache|cache:cache\nmeshname:github.com/zhoreeq/coredns-meshname\nmeship:github.com/zhoreeq/coredns-meship\nens:github.com/wealdtech/coredns-ens\nwgsd:github.com/jwhited/wgsd\nredisc:github.com/missdeer/redis|g' plugin.cfg
 echo "replace (" >> go.mod
 echo "    github.com/leiless/dnsredir => ../dnsredir" >> go.mod
 echo ")" >> go.mod
