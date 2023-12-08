@@ -16,25 +16,6 @@ only_commits:
 environment:
     GOVERSION: 1.21.1
     matrix:
-        - GOOS: android
-          GOARCH: arm
-          CGO_ENABLED: 1
-          GOARM: 7
-          PREFIX: android-arm
-          SUFFIX: 
-          HOST: linux
-        - GOOS: android
-          GOARCH: arm64
-          CGO_ENABLED: 1
-          PREFIX: android-aarch64
-          SUFFIX: 
-          HOST: linux
-        - GOOS: android
-          GOARCH: 386
-          CGO_ENABLED: 1
-          PREFIX: android-386
-          SUFFIX: 
-          HOST: linux
         - GOOS: windows
           GOARCH: amd64
           PREFIX: windows-amd64
