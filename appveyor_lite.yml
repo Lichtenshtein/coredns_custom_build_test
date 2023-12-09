@@ -1,0 +1,170 @@
+image: 
+  - macos
+  - Ubuntu
+  
+version: 1.11.1.{build}
+
+branches:
+    only:
+        - master
+
+only_commits:
+    files:
+        - trigger
+        - appveyor_lite.yml
+
+environment:
+    GOVERSION: 1.21.1
+    matrix:
+        - GOOS: windows
+          GOARCH: amd64
+          PREFIX: windows-amd64-lite
+          SUFFIX: .exe
+          HOST: linux
+        - GOOS: linux
+          GOARCH: amd64
+          CGO_ENABLED: 0
+          PREFIX: linux-amd64-lite
+          SUFFIX: 
+          HOST: linux
+        - GOOS: linux
+          GOARCH: arm
+          GOARM: 7
+          PREFIX: linux-armv7-lite
+          SUFFIX: 
+          HOST: linux
+        - GOOS: linux
+          GOARCH: mipsle
+          GOMIPS: hardfloat
+          PREFIX: linux-mipsle-hardfloat-lite
+          SUFFIX: 
+          HOST: linux
+        - GOOS: linux
+          GOARCH: mipsle
+          GOMIPS: softfloat
+          PREFIX: linux-mipsle-softfloat-lite
+          SUFFIX: 
+          HOST: linux
+
+matrix:
+  exclude:
+    - image: macos
+      HOST: linux
+    - image: Ubuntu
+      HOST: darwin
+      
+clone_depth: 1
+
+# scripts that run after cloning repository
+install:
+    - curl -O -L "https://storage.googleapis.com/golang/go$GOVERSION.$HOST-amd64.tar.gz"
+    - tar xzf "go$GOVERSION.$HOST-amd64.tar.gz"
+    - export GOROOT=$(pwd)/go
+    - export PATH=$(pwd)/go/bin:$PATH
+    - if [ "$HOST" = "darwin" ]; then brew install gnu-sed; export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" ]; then export NDK_VERSION=r24; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" ]; then export ARCH=`uname -m`; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" ]; then export ANDROID_NDK_HOME=$APPVEYOR_BUILD_FOLDER/.android/android-ndk-$NDK_VERSION; if [ ! -d "$ANDROID_NDK_HOME" ]; then mkdir -p $ANDROID_NDK_HOME; fi; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" ]; then pushd $APPVEYOR_BUILD_FOLDER/.android; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" ]; then curl -L http://dl.google.com/android/repository/android-ndk-$NDK_VERSION-linux.zip -o android-ndk-$NDK_VERSION-linux.zip; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" ]; then unzip -q android-ndk-$NDK_VERSION-linux.zip; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" ]; then ls -l; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" ]; then popd; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" ]; then export ANDROID_ARM_CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi29-clang; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" ]; then export ANDROID_ARM_CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi29-clang++; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" ]; then export ANDROID_ARM_STRIP=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/arm-linux-androideabi-strip; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" ]; then export ANDROID_X86_CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android29-clang; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" ]; then export ANDROID_X86_CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android29-clang++; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" ]; then export ANDROID_X86_STRIP=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android-strip; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" ]; then export ANDROID_AARCH64_CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android29-clang; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" ]; then export ANDROID_AARCH64_CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android29-clang++; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" ]; then export ANDROID_AARCH64_STRIP=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android-strip; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" ]; then export ANDROID_X64_CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android29-clang; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" ]; then export ANDROID_X64_CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android29-clang++; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" ]; then export ANDROID_X64_STRIP=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android-strip; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" -a "$GOARCH" = "arm" ]; then export CC=$ANDROID_ARM_CC; CXX=$ANDROID_ARM_CXX; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" -a "$GOARCH" = "arm64" ]; then export CC=$ANDROID_AARCH64_CC; CXX=$ANDROID_AARCH64_CXX; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" -a "$GOARCH" = "386" ]; then export CC=$ANDROID_X86_CC; CXX=$ANDROID_X86_CXX; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" -a "$GOARCH" = "amd64" ]; then export CC=$ANDROID_X64_CC; CXX=$ANDROID_X64_CXX; fi
+    - if [ "$GOOS" = "android" -a "$HOST" = "linux" ]; then export PATH=$ANDROID_NDK_HOME:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools:${PATH}; fi
+    - export GO111MODULE=on
+    - git clone --depth=1 https://github.com/coredns/coredns.git
+    - git clone --depth=1 https://github.com/leiless/dnsredir.git
+    - if [ "$HOST" = "darwin" ]; then cd dnsredir/pf && sudo ./download-pf-headers.sh; ls -l /usr/local/include/net; ls -l /usr/local/include/libkern; fi
+    - if [ "$HOST" = "darwin" -a "$(sw_vers -productVersion | cut -d'.' -f1)" = 10 ]; then cd /Library/Developer/CommandLineTools/SDKs; sudo rm MacOSX.sdk; sudo ln -s MacOSX11.1.sdk MacOSX.sdk; sudo rm -rf MacOSX10.15.sdk; ls -l; fi
+    
+# scripts that run before build
+before_build:
+    - go env
+    - go version
+
+# custom build scripts
+build_script:
+    - cd "$APPVEYOR_BUILD_FOLDER/coredns"
+    - git apply "$APPVEYOR_BUILD_FOLDER/forward.go.patch"
+    - git apply "$APPVEYOR_BUILD_FOLDER/forward-setup.go.patch"
+    - sed -i.bak 's|forward:forward|alternate:github.com/coredns/alternate\ndnsredir:github.com/leiless/dnsredir\nforward:forward\nproxy:github.com/missdeer/proxy\nhttps:github.com/v-byte-cpu/coredns-https|g' plugin.cfg
+    - sed -i.bak 's|cache:cache|cache:cache\nmeshname:github.com/zhoreeq/coredns-meshname\nmeship:github.com/zhoreeq/coredns-meship\nens:github.com/wealdtech/coredns-ens\nwgsd:github.com/jwhited/wgsd\nredisc:github.com/missdeer/redis|g' plugin.cfg
+    - echo "replace (" >> go.mod
+    - echo "    github.com/leiless/dnsredir => ../dnsredir" >> go.mod
+    - echo ")" >> go.mod
+    - sed -i.bak '/azure/d' plugin.cfg
+    - sed -i.bak '/route53/d' plugin.cfg
+    - sed -i.bak '/trace/d' plugin.cfg
+    - sed -i.bak '/etcd/d' plugin.cfg
+    - sed -i.bak '/clouddns/d' plugin.cfg
+    - sed -i.bak '/k8s_external/d' plugin.cfg
+    - sed -i.bak '/kubernetes/d' plugin.cfg
+    - sed -i.bak '/geoip/d' plugin.cfg
+    - sed -i.bak '/nsid/d' plugin.cfg
+    - sed -i.bak '/debug/d' plugin.cfg
+    - sed -i.bak '/autopath/d' plugin.cfg
+    - sed -i.bak '/erratic/d' plugin.cfg
+    - sed -i.bak '/metadata/d' plugin.cfg
+    - sed -i.bak '/cancel/d' plugin.cfg
+    - sed -i.bak '/pprof/d' plugin.cfg
+    - sed -i.bak '/dnstap/d' plugin.cfg
+    - sed -i.bak '/dns64/d' plugin.cfg
+    - sed -i.bak '/acl/d' plugin.cfg
+    - sed -i.bak '/chaos/d' plugin.cfg
+    - sed -i.bak '/dnssec/d' plugin.cfg
+    - sed -i.bak '/secondary/d' plugin.cfg
+    - sed -i.bak '/sign/d' plugin.cfg
+    - cat plugin.cfg
+    - if [ "$HOST" = "darwin" ]; then env CGO_ENABLED=1 GOOS=$HOST GOARCH=amd64 go generate coredns.go; else env CGO_ENABLED=0 GOOS=$HOST GOARCH=amd64 go generate coredns.go; fi
+    - if [ "$HOST" = "darwin" ]; then env CGO_ENABLED=1 GOOS=$HOST GOARCH=amd64 go get; else env CGO_ENABLED=0 GOOS=$HOST GOARCH=amd64 go get; fi
+    - if [ "$HOST" = "darwin" ]; then env GOARCH=amd64 make CGO_ENABLED=$CGO_ENABLED; mv coredns coredns.amd64; env GOARCH=arm64 make CGO_ENABLED=$CGO_ENABLED; mv coredns coredns.arm64; lipo -create -output coredns coredns.amd64 coredns.arm64; else make CGO_ENABLED=$CGO_ENABLED; fi 
+    - if [ "$GOOS" = "windows" ]; then file ./coredns.exe; else file ./coredns; fi
+    - if [ "$GOOS" = "linux" -a "$HOST" = "linux" -a "$GOARCH" = "amd64" ]; then ./coredns -plugins; fi
+    - if [ "$GOOS" = "darwin" ]; then ./coredns -plugins; fi
+    - cd ..
+
+# scripts that run after build
+after_build:
+    - mkdir -p "distrib/coredns-$PREFIX" 
+    - cp "$APPVEYOR_BUILD_FOLDER/coredns/coredns" "distrib/coredns-$PREFIX/coredns$SUFFIX"
+    - cp "$APPVEYOR_BUILD_FOLDER/coredns/coredns" "distrib/coredns$SUFFIX"
+    - if [ "$GOOS" = "windows" ]; then cp "$APPVEYOR_BUILD_FOLDER/coredns.exe.manifest" "distrib/coredns-$PREFIX/coredns.exe.manifest"; fi
+    - cd distrib
+    - curl -sSL https://gist.githubusercontent.com/missdeer/5c7c82b5b67f8afb41cfd43d51b82c2d/raw/gen_Corefile.sh | bash
+    - mv Corefile "coredns-$PREFIX/Corefile"
+    - zip -r "coredns-$PREFIX.zip" "coredns-$PREFIX" 
+    - zip -r coredns.zip "coredns$SUFFIX"
+    - md5sum "coredns$SUFFIX"
+    - sha1sum "coredns$SUFFIX"
+    - sha224sum "coredns$SUFFIX"
+    - sha256sum "coredns$SUFFIX"
+    - sha384sum "coredns$SUFFIX"
+    - sha512sum "coredns$SUFFIX"
+    - md5sum coredns.zip
+    - sha1sum coredns.zip
+    - sha224sum coredns.zip
+    - sha256sum coredns.zip
+    - sha384sum coredns.zip
+    - sha512sum coredns.zip
+
+artifacts:
+    - path: distrib/coredns-$PREFIX.zip
+      name: full_package
+    - path: distrib/coredns.zip
+      name: exe_only
