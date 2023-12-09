@@ -8,6 +8,12 @@ cd fallback
 pwd
 go mod init github.com/missdeer/fallback
 cd ..
+rm -rf alternate
+git clone --depth=1 https://github.com/coredns/alternate.git
+cd alternate
+pwd
+go mod init github.com/missdeer/fallback
+cd ..
 rm -rf meshname
 git clone --depth=1 github.com/zhoreeq/coredns-meshname.git
 cd meshname
@@ -74,6 +80,7 @@ echo "    github.com/missdeer/ads => ../ads" >> go.mod
 echo "    github.com/leiless/dnsredir => ../dnsredir" >> go.mod
 echo "    github.com/coredns/caddy/onevent => ../on" >> go.mod
 echo "    github.com/zhoreeq/coredns-meshname => ../meshname" >> go.mod
+echo "    github.com/coredns/alternate => ../alternate" >> go.mod
 echo "    github.com/zhoreeq/coredns-meship => ../meship" >> go.mod
 echo "    github.com/wealdtech/coredns-ens => ../ens" >> go.mod
 echo "    github.com/jwhited/wgsd => ../wgsd" >> go.mod
