@@ -68,7 +68,7 @@ pwd
 git checkout .
 git apply "$APPVEYOR_BUILD_FOLDER/forward.go.patch"
 git apply "$APPVEYOR_BUILD_FOLDER/forward-setup.go.patch"
-sed -i 's|forward:forward|fallback:github.com/missdeer/fallback\ndnsredir:github.com/leiless/dnsredir\nforward:forward\nproxy:github.com/missdeer/proxy|g' plugin.cfg
+sed -i 's|forward:forward|alternate:github.com/coredns/alternate\ndnsredir:github.com/leiless/dnsredir\nforward:forward\nproxy:github.com/missdeer/proxy|g' plugin.cfg
 sed -i 's|hosts:hosts|ads:github.com/missdeer/ads\nhosts:hosts|g' plugin.cfg
 sed -i 's|cache:cache|cache:cache\nmeshname:github.com/zhoreeq/coredns-meshname\nmeship:github.com/zhoreeq/coredns-meship\nens:github.com/wealdtech/coredns-ens\nwgsd:github.com/jwhited/wgsd\nredisc:github.com/missdeer/redis|g' plugin.cfg
 sed -i 's|rewrite:rewrite|rewrite:rewrite\nbogus:github.com/missdeer/bogus\nipset:github.com/missdeer/ipset|g' plugin.cfg
